@@ -6,7 +6,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/lib/pq"
 	"lan-chat/admin"
 	"lan-chat/admin/dbErrors"
 	"lan-chat/admin/jwt"
@@ -18,21 +17,20 @@ import (
 	"time"
 )
 
-func Handler() http.Handler {
-	fn := func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-		case http.MethodPost:
-			middleware.AdminMiddleware(http.HandlerFunc(registerUser)).ServeHTTP(w, r)
-		case http.MethodGet:
-			middleware.AuthMiddleware(http.HandlerFunc(listUser)).ServeHTTP(w, r)
-		case http.MethodPut:
-			middleware.AuthMiddleware(http.HandlerFunc(updateUsername)).ServeHTTP(w, r)
-		case http.MethodDelete:
-			middleware.AuthMiddleware(http.HandlerFunc(deleteUser)).ServeHTTP(w, r)
-		}
+func Handler(w http.ResponseWriter, r *http.Request) {
+
+	switch r.Method {
+	case http.MethodPost:
+		middleware.AdminMiddleware(http.HandlerFunc(registerUser)).ServeHTTP(w, r)
+	case http.MethodGet:
+		middleware.AuthMiddleware(http.HandlerFunc(listUser)).ServeHTTP(w, r)
+	case http.MethodPut:
+		middleware.AuthMiddleware(http.HandlerFunc(updateUsername)).ServeHTTP(w, r)
+	case http.MethodDelete:
+		middleware.AuthMiddleware(http.HandlerFunc(deleteUser)).ServeHTTP(w, r)
 	}
 
-	return http.HandlerFunc(fn)
+	// return http.HandlerFunc(fn)
 }
 
 func registerUser(w http.ResponseWriter, r *http.Request) { // only admin can register a user
@@ -45,8 +43,8 @@ func registerUser(w http.ResponseWriter, r *http.Request) { // only admin can re
 	}
 	hashedPassword := hashPass(user.Password)
 	err = insertUser(user.Username, hashedPassword)
-	if err, ok := err.(*pq.Error); ok {
-		if err.Code.Class() == "23" { // if error is about integrity constraint violation
+	if err != nil {
+		if dbErrors.IntegrityViolation(err) { // if error is about integrity constraint violation
 			http.Error(w, "username taken", http.StatusConflict)
 			return
 		}
