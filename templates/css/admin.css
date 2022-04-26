@@ -27,19 +27,23 @@
   position: relative;
 }
 .sidebar .logo-details .icon {
-  opacity: 0;
+  display: none;
   transition: all 0.5s ease;
 }
 .sidebar .logo-details .logo_name {
   color: #fff;
   font-size: 20px;
   font-weight: 600;
-  opacity: 0;
+  display: none;
   transition: all 0.5s ease;
 }
 .sidebar.open .logo-details .icon,
 .sidebar.open .logo-details .logo_name {
-  opacity: 1;
+  display: block;
+}
+.sidebar.open .logo-details .icon,
+.sidebar.open .logo-details .logo_name {
+  display: block;
 }
 .sidebar .logo-details #btn {
   position: absolute;
@@ -247,27 +251,6 @@
 @media (max-width: 420px) {
   .sidebar li .tooltip {
     display: none;
-  }
-}
-
-.user-profile {
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  /* width: calc(100% - 100px); */
-}
-.user-profile table {
-  width: calc(100% - 700px);
-}
-.user-Addbutton {
-  padding: 20px 40px;
-}
-@media (max-width: 420px) {
-  .user-profile table {
-    width: calc(100% - 100px);
-  }
-  .user-Addbutton {
-    padding: 15px;
   }
 }
 

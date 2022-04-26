@@ -42,6 +42,7 @@ document.getElementById('chatButton').addEventListener('click', () => {
                     connect();
                     document.getElementById("sendButton").disabled = true;
                     document.getElementById('alert').style.display = 'block'
+                    document.getElementById('homepageButton').style.display = 'block'
                 }
                 setTimeout(myFunction, counter);
                 counter = counter * 2
@@ -119,6 +120,7 @@ document.getElementById('chatButton').addEventListener('click', () => {
                     document.getElementById('messages').innerHTML = "";
                     document.getElementById('chat').style.display = 'none'
                     document.getElementById('name').style.display = 'block'
+                    document.getElementById('homepageButton').style.display = 'block'
                 }
             })
             document.getElementById('sendButton').addEventListener('click', () => {

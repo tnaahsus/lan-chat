@@ -4,50 +4,12 @@
 
 <head>
     <meta charset="UTF-8" />
+    <script src="/static/js/jquery.js"></script>
     <link rel="stylesheet" href="/static/css/admin.css" />
-    <script>
-        let token = localStorage.getItem("token");
-        console.log(token)
-        let username = localStorage.getItem("username");
-        let admin = localStorage.getItem("isAdmin");
-        if (!token)
-            window.location.assign("http://192.168.0.134/bwahahaha/login");
-        function ciCompare(a, b) {
-            return typeof a === 'string' && typeof b === 'string'
-                ? a.localeCompare(b, undefined, { sensitivity: 'accent' }) === 0
-                : a === b;
-        }
-        window.onload = () => {
-            let url = window.location.href;
-            url = url.split('?').pop();
-            const argArray = new URLSearchParams(url)
-            let query = argArray.has('section') ? argArray.get('section') : ''
-            const data = ['users', 'shows', 'videos', 'types']
-            if (query === '') {
-                url = new URL(window.location.href);
-                url.searchParams.append('section', data[0]);
-                window.location.assign(url.href);
-            }
-            else {
-                for (const datas of data) {
-                    if (ciCompare(query, datas)) {
-                        document.getElementById(`${datas}Section`).style.display = 'flex'
-                        document.getElementById(`${datas}Icon`).style.color = '#11101d'
-                        document.getElementById(`${datas}linkName`).style.color = '#11101d'
-                        document.getElementById(`${datas}Sidebar`).style.background = '#fff'
-                    }
-                    if (!ciCompare(query, datas)) {
-                        document.getElementById(`${datas}Section`).style.display = 'none'
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="stylesheet" href="/static/bootstrap-5.1.3-dist/css/bootstrap.min.css">
-    <!--<title> Responsive Sidebar Menu  | CodingLab </title>-->
-    <!-- Boxicons CDN Link -->
+    <script src="/static/js/admin.js"></script>
+    <link rel="stylesheet" href="/static/bootstrap-5.1.3-dist/css/bootstrap.min.css" />
     <link href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" />
     <script src="/static/bootstrap-5.1.3-dist/js/bootstrap.bundle.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
@@ -56,34 +18,16 @@
             padding-left: 0rem;
         }
     </style>
-    <script>
-        function usernameFetcher(username) {
-            fetch(`/user?username=${username}`, {
-                method: "Get",
-                headers: {
-                    'Access-Control-Allow-Credentials': 'true',
-                    'Authorization': "Bearer " + token
-                }
-            })
-                .then((response) => response.json())
-                .then((result) => {
-                    // console.log(result)
-                })
-                .catch((error) => {
-                    // console.log(error)
-                })
-        }
-        usernameFetcher(username)
-    </script>
+    <link rel="stylesheet" href="/static/css/dropdown.css" />
 </head>
 
 <body>
     <div class="sidebar">
         <div class="logo-details">
             <i class="bx bx-user icon" data-bs-toggle="modal" data-bs-target="#mainuserModal"
-                style="cursor: pointer;"></i>
+                style="cursor: pointer"></i>
             <div class="logo_name" id="userName" data-bs-toggle="modal" data-bs-target="#mainuserModal"
-                style="cursor: pointer;"></div>
+                style="cursor: pointer"></div>
             <i class="bx bx-menu" id="btn"></i>
         </div>
         <ul class="nav-list">
@@ -121,20 +65,68 @@
         <div class="user-profile" id="usersSection">
             <div class="user-Addbutton">
                 <button type="button" class="btn btn-outline-dark mb-3 float-end" data-bs-toggle="modal"
-                    data-bs-target="#postModal"><i class="bi bi-plus"></i> Add
-                    user</button>
+                    data-bs-target="#postModal">
+                    <i class="bi bi-plus"></i> Add user
+                </button>
             </div>
             <table class="table mx-auto">
                 <tr>
                     <th scope="col">Users</th>
                 </tr>
-                <tbody id="tbody">
-                </tbody>
+                <tbody id="tbody"></tbody>
             </table>
         </div>
-        <div id="showsSection" style="display:none;">Show</div>
-        <div id="videosSection" style="display:none;">Video</div>
-        <div id="typesSection" style="display:none;">Types</div>
+        <div class="shows-section" id="showsSection" style="display: none">
+            <div class="shows-Addbutton" id="shows-Addbutton">
+                <button type="button" class="btn btn-outline-dark mb-3 float-end" data-bs-toggle="modal"
+                    data-bs-target="#showModal">
+                    <i class="bi bi-plus"></i> Add Show
+                </button>
+                <div class="form-floating float-start mb-4 me-5 selectQuery">
+                    <select id="showNameQuery" class=" form-select   bg-transparent  me-5 " onchange="handleQuery()">
+                        <option value="none">None</option>
+                    </select>
+                    <label for="showNameQuery" class="queryLabel">Name of the Show</label>
+                </div>
+                <div class="form-floating mb-4 me-5 float-start selectQuery">
+                    <select id="totalEpsQuery" name="" class=" form-select  bg-transparent  me-5 "
+                        onchange="handleQuery()">
+                        <option value="none">None</option>
+                    </select>
+                    <label for="totalEpsQuery" class="queryLabel">Total Eps</label>
+                </div>
+                <div class="form-floating mb-4 me-5 float-start selectQuery">
+                    <select id="typeQuery" name="" class=" form-select   bg-transparent  me-5 "
+                        onchange="handleQuery()">
+                        <option value="none">None</option>
+                    </select>
+                    <label for="typeQuery" class="queryLabel">Types</label>
+                </div>
+            </div>
+            <table class="table mx-auto" id="shows-table">
+                <tr>
+                    <th scope="col">Shows</th>
+                    <th scope="col">Total Eps</th>
+                    <th scope="col">Type</th>
+                </tr>
+                <tbody id="showstbody"></tbody>
+            </table>
+        </div>
+        <div class="videos-section" id="videosSection" style="display: none">Video</div>
+        <div class="types-section" id="typesSection" style="display: none">
+            <div class="types-Addbutton">
+                <button type="button" class="btn btn-outline-dark mb-3 float-end" data-bs-toggle="modal"
+                    data-bs-target="#addtype">
+                    <i class="bi bi-plus"></i> Add type
+                </button>
+            </div>
+            <table class="table mx-auto">
+                <tr>
+                    <th scope="col">Types</th>
+                </tr>
+                <tbody id="typestbody"></tbody>
+            </table>
+        </div>
     </section>
     <div class="modal fade" id="mainuserModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -144,7 +136,7 @@
                     <button type="button" class="btn-close" id="editClose" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
-                <form style="padding:10px 20px">
+                <form style="padding: 10px 20px">
                     <div class="form-floating mb-1">
                         <input type="text" class="form-control" id="editusername" placeholder="username" />
                         <label for="floatingInput">Edit Username</label>
@@ -153,11 +145,12 @@
                         Edit
                     </button>
                 </form>
-                <div class="mt-1" id="editerror" style="color: red;"></div>
+                <div class="mt-1" id="editerror" style="color: red"></div>
                 <span class="fw-bolder text-center">OR</span>
                 <div class="modal-body d-flex justify-content-center">
-                    <button type="button" onclick="LogOut()" class="btn btn-outline-dark  w-75  mt-2">Log
-                        Out</button>
+                    <button type="button" onclick="LogOut()" class="btn btn-outline-dark w-75 mt-2">
+                        Log Out
+                    </button>
                 </div>
             </div>
         </div>
@@ -170,7 +163,7 @@
                     <button type="button" id="addClose" class="btn-close" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
-                <form style="padding:10px 20px">
+                <form style="padding: 10px 20px">
                     <div class="form-floating mb-4">
                         <input type="text" class="form-control" id="addusername" placeholder="username" />
                         <label for="floatingInput">Username</label>
@@ -183,7 +176,7 @@
                         Add
                     </button>
                 </form>
-                <div class="mt-3" id="adderror" style="color: red;"></div>
+                <div class="mt-3" id="adderror" style="color: red"></div>
             </div>
         </div>
     </div>
@@ -194,146 +187,163 @@
                     <button type="button" id="DeleteClose" class="btn-close" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    Do you want to delete the user?
-                </div>
+                <div class="modal-body">Do you want to delete the user?</div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-outline-danger" onclick="DeleteUser()">Delete</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                    <button type="button" class="btn btn-outline-danger" onclick="DeleteUser()">
+                        Delete
+                    </button>
                 </div>
             </div>
         </div>
     </div>
-    <script>
-        if (!admin) document.getElementById("user").style.display = "none";
-        document.getElementById('userName').innerHTML += username
-        document.getElementById('modal-title').innerHTML = `Hi ${username}`;
-        let sidebar = document.querySelector(".sidebar");
-        let closeBtn = document.querySelector("#btn");
-        closeBtn.addEventListener("click", () => {
-            sidebar.classList.toggle("open");
-            menuBtnChange(); 
-        });
-        function menuBtnChange() {
-            if (sidebar.classList.contains("open")) {
-                closeBtn.classList.replace("bx-menu", "bx-menu-alt-right"); //replacing the iocns class
-            } else {
-                closeBtn.classList.replace("bx-menu-alt-right", "bx-menu"); //replacing the iocns class
-            }
-        }
-    </script>
-    <script>
-        function LogOut() {
-            localStorage.clear();
-            window.location.assign("http://192.168.0.134/bwahahaha/login");
-        }
-        function userFetch(result,name) {
-            let tableRef = document.getElementById('tbody').innerHTML = '';
-            let t = result ? result : token
-            fetch(`/users`, {
-                method: "Get",
-                headers: {
-                    'Access-Control-Allow-Credentials': 'true',
-                    'Authorization': "Bearer " + t
-                }
-            })
-                .then((response) => response.json())
-                .then((result) => {
-                    for (const user of result.users) {
-                        users = name ? name : username
-                        if (user !== users ) {
-                            let myHtmlContent = `<td>${user}</td>
-                            <td><span  style='cursor:pointer;'data-bs-toggle="modal"
-                        data-bs-target="#deleteModal"  data-bs-whatever=${user}><i class="bi bi-trash3-fill"></i></span> </td>`
-                            let tableRef = document.getElementById('tbody');
-                            let newRow = tableRef.insertRow(tableRef.rows.length);
-                            newRow.innerHTML = myHtmlContent;
-                        }
-                    }
-                })
-                .catch((error) => {
-                    console.log(error)
-                })
-        }
-        userFetch()
-        function AddUser() {
-            let username = document.getElementById('addusername').value
-            let password = document.getElementById('addpassword').value
-            document.getElementById('adderror').innerHTML += ''
-            fetch("/user", {
-                method: "POST",
-                headers: {
-                    'Access-Control-Allow-Credentials': 'true',
-                    'Authorization': "Bearer " + token
-                },
-                body: JSON.stringify({
-                    username: username,
-                    password: password
-                }),
-            })
-                .then((result) => {
-                    userFetch()
-                    document.getElementById("addClose").click();
-                })
-                .catch((error) => {
-                    document.getElementById('adderror').innerHTML += error.message
-                })
-        }
-        function EditUser() {
-            let username = document.getElementById('editusername').value
-            document.getElementById('adderror').innerHTML += ''
-            fetch("/user", {
-                method: "PUT",
-                headers: {
-                    'Access-Control-Allow-Credentials': 'true',
-                    'Authorization': "Bearer " + token
-                },
-                body: JSON.stringify({
-                    username: username
-                }),
-            })
-                .then((response) =>  response.json())
-                .then((result) => {
-                    userFetch()
-                    document.getElementById('modal-title').innerHTML = ``;
-                    document.getElementById('userName').innerHTML = ''
-                    document.getElementById('modal-title').innerHTML = `Hi ${username}`;
-                    document.getElementById('userName').innerHTML = username
-                    localStorage.setItem('username', username)
-                    localStorage.setItem('token', result.token)
-                    userFetch(result.token,username)
-                    document.getElementById("editClose").click();
-                })
-                .catch((error) => {
-                    document.getElementById('editerror').innerHTML += error.message
-                })
-        }
-        let deleteUsername
-        let exampleModal = document.getElementById('deleteModal')
-        exampleModal.addEventListener('show.bs.modal', function (event) {
-            let button = event.relatedTarget
-            deleteUsername = button.getAttribute('data-bs-whatever');
-        })
-        function DeleteUser() {
-            let username = document.getElementById('addusername').value
-            let password = document.getElementById('addpassword').value
-            document.getElementById('adderror').innerHTML += ''
-            fetch(`/user?username=${deleteUsername}`, {
-                method: "DELETE",
-                headers: {
-                    'Access-Control-Allow-Credentials': 'true',
-                    'Authorization': "Bearer " + token
-                }
-            })
-                .then((result) => {
-                    userFetch()
-                    document.getElementById("DeleteClose").click();
-                })
-                .catch((error) => {
-                    document.getElementById('adderror').innerHTML += error.message
-                })
-        }
-    </script>
+    <div class="modal fade" id="deleteshow" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" id="DeleteshowClose" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">Do you want to delete the show?</div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                    <button type="button" class="btn btn-outline-danger" onclick="deleteAllshows()">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="showModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add Show</h5>
+                    <button type="button" id="showClose" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <form style="padding: 10px 20px">
+                    <div class="form-floating mb-4">
+                        <input type="text" class="form-control" id="showName" placeholder="Name of the Show" />
+                        <label for="showName">Name of the show</label>
+                    </div>
+                    <div class="form-floating mb-4">
+                        <input type="number" value="1" class="form-control" id="totaeps" placeholder="Total Episodes" />
+                        <label for="totaeps">Total Episodes</label>
+                    </div>
+                    <div class="form-floating mb-4">
+                        <select class="form-select" id="floatingSelect"
+                            aria-label="Floating label select example"></select>
+                        <label for="floatingSelect">Types</label>
+                    </div>
+                    <button class="w-100 btn btn-lg btn-dark mt-3" onclick="AddShow()" type="button">
+                        Add
+                    </button>
+                </form>
+                <div class="mt-3" id="showerror" style="color: red"></div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="editshow" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Edit Show</h5>
+                    <button type="button" id="editshowClose" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <form style="padding: 10px 20px">
+                    <div class="form-floating mb-4">
+                        <input type="text" class="form-control" id="editshowName" placeholder="Name of the Show" />
+                        <label for="showName">Name of the show</label>
+                    </div>
+                    <div class="form-floating mb-4">
+                        <input type="number" value="1" class="form-control" id="edittotaeps"
+                            placeholder="Total Episodes" />
+                        <label for="totaeps">Total Episodes</label>
+                    </div>
+                    <div class="form-floating mb-4">
+                        <select class="form-select" id="editfloatingSelect"
+                            aria-label="Floating label select example"></select>
+                        <label for="floatingSelect">Types</label>
+                    </div>
+                    <button class="w-100 btn btn-lg btn-dark mt-3" onclick="EditShow()" type="button">
+                        Edit
+                    </button>
+                </form>
+                <div class="mt-3" id="showerror" style="color: red"></div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="addtype" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add Type</h5>
+                    <button type="button" id="addtypeClose" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <form style="padding: 10px 20px">
+                    <div class="form-floating mb-4">
+                        <input type="text" class="form-control" id="addnewType" placeholder="New Type" />
+                        <label for="showName">New Type</label>
+                    </div>
+                    <button class="w-100 btn btn-lg btn-dark mt-3" onclick="AddType()" type="button">
+                        Add
+                    </button>
+                </form>
+                <div class="mt-3" id="addtypeerror" style="color: red"></div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="edittype" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Edit Type</h5>
+                    <button type="button" id="edittypeClose" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <form style="padding: 10px 20px">
+                    <div class="form-floating mb-4">
+                        <input type="text" class="form-control" id="editnewType" placeholder="Type" />
+                        <label for="showName">Type</label>
+                    </div>
+                    <button class="w-100 btn btn-lg btn-dark mt-3" onclick="EditType()" type="button">
+                        Edit
+                    </button>
+                </form>
+                <div class="mt-3" id="edittypeerror" style="color: red"></div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="deletetype" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" id="DeletetypeClose" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">Do you want to delete the type?</div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                    <button type="button" class="btn btn-outline-danger" onclick="deleteAlltypes()">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/dropdown.js"></script>
+    <script src="/static/js/sidebar.js"></script>
+    <script src="/static/js/adminApi.js"></script>
 
 </body>
 
