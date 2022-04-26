@@ -59,7 +59,7 @@ function AddUser() {
 function EditUser() {
   let username = document.getElementById("editusername").value;
   document.getElementById("adderror").innerHTML += "";
-  fetch("/user", {
+  fetch(`/user/${username}`, {
     method: "PUT",
     headers: {
       "Access-Control-Allow-Credentials": "true",
@@ -93,7 +93,7 @@ exampleModal.addEventListener("show.bs.modal", function (event) {
 });
 function DeleteUser() {
   document.getElementById("adderror").innerHTML += "";
-  fetch(`/user?username=${deleteUsername}`, {
+  fetch(`/user/${deleteUsername}`, {
     method: "DELETE",
     headers: {
       "Access-Control-Allow-Credentials": "true",
@@ -169,7 +169,7 @@ editTypeModal.addEventListener("show.bs.modal", function (event) {
 function EditType() {
   let typeName = document.getElementById("editnewType").value;
   document.getElementById("edittypeerror").innerHTML += "";
-  fetch(`/type?id=${editType}`, {
+  fetch(`/type/${editType}`, {
     method: "PUT",
     headers: {
       "Access-Control-Allow-Credentials": "true",
@@ -195,7 +195,7 @@ deleteTypeModal.addEventListener("show.bs.modal", function (event) {
   deleteType = button.getAttribute("data-bs-whatever");
 });
 function deleteAlltypes() {
-  fetch(`/type?id=${deleteType}`, {
+  fetch(`/type/${deleteType}`, {
     method: "DELETE",
     headers: {
       "Access-Control-Allow-Credentials": "true",
@@ -233,13 +233,12 @@ function handleQuery() {
     result.searchParams.delete(key);
     return result.toString().replace(dummyBaseUrl, "");
   }
-  console.log(nameQuery,totalEpsQuery,typeQuery );
+  console.log(nameQuery, totalEpsQuery, typeQuery);
   if (
     nameQuery !== "none" &&
     totalEpsQuery !== "none" &&
     typeQuery !== "none"
   ) {
-    
     link = `/show?name=${nameQuery}&totalEps=${totalEpsQuery}&type=${typeQuery}`;
   } else if (
     nameQuery !== "none" ||

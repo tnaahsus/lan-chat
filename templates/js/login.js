@@ -21,7 +21,9 @@ function logIN() {
       localStorage.setItem("username", username);
       localStorage.setItem("token", result.token);
       localStorage.setItem("isAdmin", result.isAdmin);
-      window.location.assign("http://192.168.0.134/bwahahaha/admin?section=users");
+      window.location.assign(
+        "http://192.168.0.134/bwahahaha/admin?section=users"
+      );
     })
     .catch((error) => {
       document.getElementById("error").innerHTML += error.message;

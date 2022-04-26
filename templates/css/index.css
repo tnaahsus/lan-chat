@@ -306,7 +306,7 @@ body {
 #navbar {
   color: var(--font-color);
 }
-#nav{
+#nav {
   border-bottom: 2px solid var(--foreground-color);
 }
 

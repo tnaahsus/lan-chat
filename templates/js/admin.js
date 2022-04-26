@@ -64,5 +64,3 @@ function usernameFetcher(username) {
     });
 }
 usernameFetcher(username);
-
-
